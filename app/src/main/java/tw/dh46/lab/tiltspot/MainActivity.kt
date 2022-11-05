@@ -10,8 +10,8 @@ import android.os.Bundle
 import android.widget.TextView
 
 import android.hardware.SensorManager
-
-
+import android.widget.ImageView
+import kotlin.math.abs
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -41,6 +41,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var mAccelerometerData = FloatArray(3)
     private var mMagnetometerData = FloatArray(3)
 
+
+    private var mSpotTop: ImageView? = null
+    private var mSpotBottom: ImageView? = null
+    private var mSpotLeft: ImageView? = null
+    private var mSpotRight: ImageView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -48,15 +54,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // Lock the orientation to portrait (for now)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        mTextSensorAzimuth = findViewById(R.id.value_azimuth);
-        mTextSensorPitch = findViewById(R.id.value_pitch);
-        mTextSensorRoll = findViewById(R.id.value_roll);
+        initViews()
 
         // Get accelerometer and magnetometer sensors from the sensor manager.
         // The getDefaultSensor() method returns null if the sensor
         // is not available on the device.
         mSensorManager = getSystemService(
-                Context.SENSOR_SERVICE) as SensorManager
+            Context.SENSOR_SERVICE) as SensorManager
         mSensorAccelerometer = mSensorManager?.getDefaultSensor(
             Sensor.TYPE_ACCELEROMETER)
         mSensorMagnetometer = mSensorManager?.getDefaultSensor(
@@ -125,9 +129,51 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             val pitch = orientationValues[1]
             val roll = orientationValues[2]
 
-            mTextSensorAzimuth?.text = resources.getString(R.string.value_format, azimuth)
-            mTextSensorPitch?.text = resources.getString(R.string.value_format, pitch)
-            mTextSensorRoll?.text = resources.getString(R.string.value_format, roll)
+            updateViews(pitch, roll, azimuth)
+        }
+    }
+
+    private fun updateViews(_pitch: Float, _roll: Float, _azimuth: Float) {
+        //  reset the pitch or roll values that are close to 0 (less than the value of the VALUE_DRIFT constant) to be 0:
+        val pitch = if (abs(_pitch) < VALUE_DRIFT) {
+            0f
+        } else {
+            _pitch
+        }
+
+        val roll =  if (abs(_roll) < VALUE_DRIFT) {
+            0f
+        } else {
+            _roll
+        }
+
+        mTextSensorAzimuth?.text = resources.getString(R.string.value_format, _azimuth)
+        mTextSensorPitch?.text = resources.getString(R.string.value_format, pitch)
+        mTextSensorRoll?.text = resources.getString(R.string.value_format, roll)
+
+        // reset ui state
+        mSpotTop?.alpha = 0f;
+        mSpotBottom?.alpha = 0f;
+        mSpotLeft?.alpha = 0f;
+        mSpotRight?.alpha = 0f;
+
+        // Update the alpha value for the appropriate spot with the values for pitch and roll.
+        // Note that the pitch and roll values you calculated in the previous task are in radians,
+        // and their values range from -π to +π. Alpha values, on the other hand, range only from 0.0 to 1.0.
+        // You could do the math to convert radian units to alpha values,
+        // but you may have noted earlier that the higher pitch and roll values only occur
+        // when the device is tilted vertical or even upside down.
+        // For the TiltSpot app you're only interested in displaying dots in response to some device tilt,
+        // not the full range. This means that you can conveniently use the radian units directly as input to the alpha.
+        if (pitch > 0) {
+            mSpotBottom?.alpha = pitch
+        } else {
+            mSpotTop?.alpha = abs(pitch)
+        }
+        if (roll > 0) {
+            mSpotLeft?.alpha = roll
+        } else {
+            mSpotRight?.alpha = abs(roll)
         }
     }
 
@@ -138,4 +184,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, status: Int) {
     }
 
+
+    private fun initViews() {
+        mTextSensorAzimuth = findViewById(R.id.value_azimuth)
+        mTextSensorPitch = findViewById(R.id.value_pitch)
+        mTextSensorRoll = findViewById(R.id.value_roll)
+
+        mSpotTop = findViewById(R.id.spot_top)
+        mSpotBottom = findViewById(R.id.spot_bottom)
+        mSpotRight = findViewById(R.id.spot_right)
+        mSpotLeft = findViewById(R.id.spot_left)
+    }
 }

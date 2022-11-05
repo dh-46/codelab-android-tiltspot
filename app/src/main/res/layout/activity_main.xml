@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright 2017 Google Inc.
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright 2017 Google Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,8 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -35,43 +33,43 @@ limitations under the License. -->
         <!-- Labels -->
         <TextView
             android:id="@+id/label_azimuth"
+            style="@style/Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_azimuth_string"
-            style="@style/Label"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/label_group"/>
+            app:layout_constraintTop_toTopOf="@+id/label_group" />
 
         <TextView
             android:id="@+id/label_pitch"
+            style="@style/Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_pitch_string"
-            style="@style/Label"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/label_azimuth"/>
+            app:layout_constraintTop_toBottomOf="@id/label_azimuth" />
 
         <TextView
             android:id="@+id/label_roll"
+            style="@style/Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_roll_string"
-            style="@style/Label"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/label_pitch"/>
+            app:layout_constraintTop_toBottomOf="@id/label_pitch" />
 
         <!-- Values -->
         <TextView
             android:id="@+id/value_azimuth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/base_margin"
             android:layout_marginStart="@dimen/base_margin"
+            android:layout_marginLeft="@dimen/base_margin"
             android:text="@string/value_format"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
             app:layout_constraintLeft_toRightOf="@id/label_azimuth"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/label_group"/>
+            app:layout_constraintTop_toTopOf="@+id/label_group" />
 
         <TextView
             android:id="@+id/value_pitch"
@@ -80,7 +78,7 @@ limitations under the License. -->
             android:text="@string/value_format"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/value_azimuth"/>
+            app:layout_constraintTop_toBottomOf="@id/value_azimuth" />
 
         <TextView
             android:id="@+id/value_roll"
@@ -89,7 +87,50 @@ limitations under the License. -->
             android:text="@string/value_format"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/value_pitch"/>
+            app:layout_constraintTop_toBottomOf="@id/value_pitch" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ImageView
+        android:id="@+id/spot_top"
+        android:layout_width="@dimen/spot_size"
+        android:layout_height="@dimen/spot_size"
+        android:layout_margin="@dimen/base_margin"
+        android:alpha="0.05"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/spot" />
+
+    <ImageView
+        android:id="@+id/spot_bottom"
+        android:layout_width="@dimen/spot_size"
+        android:layout_height="@dimen/spot_size"
+        android:layout_margin="@dimen/base_margin"
+        android:alpha="0.05"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/spot" />
+
+    <ImageView
+        android:id="@+id/spot_left"
+        android:layout_width="@dimen/spot_size"
+        android:layout_height="@dimen/spot_size"
+        android:layout_margin="@dimen/base_margin"
+        android:alpha="0.05"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/spot" />
+
+    <ImageView
+        android:id="@+id/spot_right"
+        android:layout_width="@dimen/spot_size"
+        android:layout_height="@dimen/spot_size"
+        android:layout_margin="@dimen/base_margin"
+        android:alpha="0.05"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/spot" />
 </androidx.constraintlayout.widget.ConstraintLayout>
