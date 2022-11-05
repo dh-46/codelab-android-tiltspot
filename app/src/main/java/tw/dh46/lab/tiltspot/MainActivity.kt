@@ -34,6 +34,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     // non-zero drift.
     private val VALUE_DRIFT = 0.05f
 
+    // When a sensor event occurs, both the accelerometer and the magnetometer produce arrays of floating-point values
+    // representing points on the x-axis, y-axis, and z-axis of the device's coordinate system.
+    // You will combine the data from both these sensors, and over several calls to onSensorChanged(),
+    // so you need to retain a copy of this data each time it changes.
+    private var mAccelerometerData = FloatArray(3)
+    private var mMagnetometerData = FloatArray(3)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -89,6 +96,39 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
     override fun onSensorChanged(event: SensorEvent?) {
+        event?.let {
+            when (it.sensor.type) {
+                Sensor.TYPE_ACCELEROMETER -> {
+                    //  use the clone() method to explicitly make a copy of the data in the values array.
+                    //  The SensorEvent object (and the array of values it contains) is reused across calls to onSensorChanged().
+                    //  Cloning those values prevents the data you're currently interested in from being changed by more recent data before you're done with it.
+                    mAccelerometerData = it.values.clone()
+                }
+                Sensor.TYPE_MAGNETIC_FIELD -> {
+                    mMagnetometerData = it.values.clone()
+                }
+            }
+
+            // generate a rotation matrix (explained below) from the raw accelerometer and magnetometer data.
+            val rotationMatrix = FloatArray(9)
+            val rotationOK = SensorManager.getRotationMatrix(rotationMatrix,
+                null, mAccelerometerData, mMagnetometerData)
+
+            // Call the SensorManager.getOrientation() method to get the orientation angles from the rotation matrix.
+            // As with getRotationMatrix(), the array of float values containing those angles is supplied to the getOrientation() method and modified in place.
+            val orientationValues = FloatArray(3)
+            if (rotationOK) {
+                SensorManager.getOrientation(rotationMatrix, orientationValues);
+            }
+
+            val azimuth = orientationValues[0]
+            val pitch = orientationValues[1]
+            val roll = orientationValues[2]
+
+            mTextSensorAzimuth?.text = resources.getString(R.string.value_format, azimuth)
+            mTextSensorPitch?.text = resources.getString(R.string.value_format, pitch)
+            mTextSensorRoll?.text = resources.getString(R.string.value_format, roll)
+        }
     }
 
     /**
