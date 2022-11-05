@@ -187,9 +187,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             _roll
         }
 
-        mTextSensorAzimuth?.text = resources.getString(R.string.value_format, _azimuth)
-        mTextSensorPitch?.text = resources.getString(R.string.value_format, pitch)
-        mTextSensorRoll?.text = resources.getString(R.string.value_format, roll)
+        mTextSensorAzimuth?.text = resources.getString(R.string.value_format,
+            _azimuth,
+            (Math.toDegrees(_azimuth.toDouble()) + 360) % 360)
+        mTextSensorPitch?.text =
+            resources.getString(R.string.value_format, pitch, Math.toDegrees(pitch.toDouble()))
+        mTextSensorRoll?.text =
+            resources.getString(R.string.value_format, roll, Math.toDegrees(roll.toDouble()))
 
         // reset ui state
         mSpotTop?.alpha = 0f;

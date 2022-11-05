@@ -10,5 +10,5 @@
      that will be filled in at runtime:
      %1 is the value to replace
      $.2f says the value is a float, with two decimal places.  -->
-    <string name="value_format">%1$.2f</string>
+    <string name="value_format">%1$.2f \n%2$.2f</string>
 </resources>
