@@ -10,8 +10,12 @@ import android.os.Bundle
 import android.widget.TextView
 
 import android.hardware.SensorManager
+import android.os.Build
+import android.view.Display
+import android.view.Surface
 import android.widget.ImageView
 import kotlin.math.abs
+import android.view.WindowManager
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -47,12 +51,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var mSpotLeft: ImageView? = null
     private var mSpotRight: ImageView? = null
 
+    private var mDisplay: Display? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Lock the orientation to portrait (for now)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        // requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        mDisplay = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            display
+        } else {
+            val wm = getSystemService(WINDOW_SERVICE) as WindowManager
+            @Suppress("DEPRECATION")
+            wm.defaultDisplay
+        }
 
         initViews()
 
@@ -118,11 +131,38 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             val rotationOK = SensorManager.getRotationMatrix(rotationMatrix,
                 null, mAccelerometerData, mMagnetometerData)
 
+            // remap coordination
+            var rotationMatrixAdjusted = FloatArray(9)
+            when (mDisplay?.rotation) {
+                Surface.ROTATION_0 -> {
+                    rotationMatrixAdjusted = rotationMatrix.clone()
+                }
+                Surface.ROTATION_90 -> {
+                    // This method takes as arguments the original rotation matrix,
+                    // the two new axes on which you want to remap the existing x-axis and y-axis,
+                    // and an array to populate with the new data.
+                    // Use the axis constants from the SensorManager class to represent the coordinate system axes.
+                    SensorManager.remapCoordinateSystem(rotationMatrix,
+                        SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X,
+                        rotationMatrixAdjusted)
+                }
+                Surface.ROTATION_180 -> {
+                    SensorManager.remapCoordinateSystem(rotationMatrix,
+                        SensorManager.AXIS_MINUS_X, SensorManager.AXIS_MINUS_Y,
+                        rotationMatrixAdjusted)
+                }
+                Surface.ROTATION_270 -> {
+                    SensorManager.remapCoordinateSystem(rotationMatrix,
+                        SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_X,
+                        rotationMatrixAdjusted)
+                }
+            }
+
             // Call the SensorManager.getOrientation() method to get the orientation angles from the rotation matrix.
             // As with getRotationMatrix(), the array of float values containing those angles is supplied to the getOrientation() method and modified in place.
             val orientationValues = FloatArray(3)
             if (rotationOK) {
-                SensorManager.getOrientation(rotationMatrix, orientationValues);
+                SensorManager.getOrientation(rotationMatrixAdjusted, orientationValues);
             }
 
             val azimuth = orientationValues[0]
@@ -141,7 +181,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             _pitch
         }
 
-        val roll =  if (abs(_roll) < VALUE_DRIFT) {
+        val roll = if (abs(_roll) < VALUE_DRIFT) {
             0f
         } else {
             _roll
